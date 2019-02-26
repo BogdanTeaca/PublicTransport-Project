@@ -1,0 +1,115 @@
+TEACA BOGDAN
+
+Aplicatie "Retea de transport public"
+
+1. Introducere
+
+Aplicatia are ca scop simularea orarelor si a rutelor unei retele de transport
+public dintr-un oras. Interactiunea cu reteaua de transport se face prin
+intermediul comenzilor. Pentru afisarea tuturor comenzilor posibile si a
+instructiunilor de folosire ale acestora se poate tasta comanda 'help'.
+
+Mai multe unitati de transport (autobuze, troleibuze si tramvaie) pot fi
+asignate unei rute. O ruta este dus-intors si este alcatuita din mai multe
+statii si intersectii. O ruta incepe si se termina obligatoriu cu o statie.
+
+O statie apartine unui drum si pot exista mai multe statii pe acelasi drum. Un
+drum (sau o strada) este format din minim 2 intersectii (caz in care acestea se
+afla la capetele drumului). Intersectiile sunt elementele de legatura dintre
+drumuri. Intersectiile se pot afla la capatul sau in interiorul unui drum.
+
+Pentru afisarea orarelor unei rute este nevoie de asignarea a cel putin o
+unitate de transport la ruta respectiva. Orarele sunt calculate automat pe baza
+lungimii rutei, tipului de ruta si vitezei unitatii de transport.
+
+Pentru crearea unei retele de transport public este nevoie de crearea in ordinea
+urmatoare a: intersectii -> drumuri -> statii -> rute -> unitati de transport
+
+Au fost implementate comenzi pentru salvarea unei retele de transport intr-un
+fisier, incarcarea unei retele de transport dintr-un fisier si pentru resetarea
+retelei de transport (inceperea de la zero a retelei).
+
+Metoda "main" se afla in clasa "TransportPublic" din pachetul "interfata".
+
+2. Exemplu de succesiune de comenzi pentru crearea unei retele simple:
+
+(Aceasta succesiune de comenzi a fost deja salvata in fisierul "fisier_retea.save" din folderul
+cu proiectul Java. Pentru incarcarea acestui fisier se poate tasta comanda "load fisier_retea.save")
+
+	i add //creaza intersectia 1
+	i add //creaza intersectia 2
+	i add //creaza intersectia 3
+	i show //(optional) afiseaza intersectiile
+	d add "Str. Gradinii" 5000 1 2 //creaza drumul de 5000m intre intersectiile 1 si 2
+	d add "Str. Eminescu" 4000 2 3 //creaza drumul de 4000m intre intersectiile 2 si 3
+	d show //(optional) afiseaza drumurile
+	s add Preciziei "Str. Gradinii" 100 //creaza statia pe "Str. Gradinii" la 100m
+	s add Saligny "Str. Gradinii" 4300 //creaza statia pe "Str. Gradinii" la 4300m
+	s add Traian "Str. Eminescu" 3000 //creaza statia pe "Str. Eminescu" la 3000m
+	r add a 311 Preciziei Saligny 2 "Str. Eminescu" Traian //creaza ruta 311 de autobuz (a)
+	r zoom 311 //(optional) afiseaza in detaliu ruta 311 (cu intersectii si statii)
+	r show 311 //(optional) afiseaza ruta 311 doar cu statii
+	u add a u100 //creaza unitatea de transport u100 de tip autobuz
+	u add a u200 //creaza unitatea de transport u200 de tip autobuz
+	r give 311 u100 //asigneaza autobuzul u100 la ruta 311
+	r give 311 u200 //asigneaza autobuzul u200 la ruta 311
+	r orar 311 //afiseaza orarul rutei 311
+	save numefisier //salveaza reteaua de transport intr-un fisier
+	reset //reseteaza reteaua de transport
+	load numefisier //incarca reteaua de transport dintr-un fisier
+	exit //iesire din program
+
+3. Utilizarea de clase interne in aplicatie
+
+Clasele interne au fost folosite in aplicatie:
+
+- In clasa "CatalogComenzi" clasele interne "ComandaGeneral", "ComandaIntersectii", etc, care
+implementeaza interfata "Comanda" pentru a grupa logic comenzile aplicatiei de restul proiectului
+si pentru gestionarea acestor comenzi mai usor din clasa "TransportPublic"
+
+- In clasa "Ruta" clasa interna privata "ElementOrarRuta" pentru gruparea logica a orarului
+unei unitati de transport cu ruta si pentru controlul vizibilitatii clasei "ElementOrarRuta"
+fata de restul pachetului si a proiectului Java.
+
+- In clasa "UnitateTransport" clasa interna "ElementOrarUnitate" pentru gruparea logica
+a orarului unei unitati de transport cu unitatea de transport.
+
+4. Utilizarea de Collection Frameworks in aplicatie
+
+Pentru retinerea interna a obiectelor de tip intersectie, drum, statie, ruta, etc, am
+folosit in aplicatie structuri de date din Collection Frameworks cum ar fi:
+
+- List initializate ca ArrayList in clasele "Oras", "Drum", clasa interna "ElementOrarUnitate", etc
+- SortedSet in clasa "Ruta" pentru a retine si sorta orele din orarul rutei. Pentru aceasta,
+clasa "ElementOrarRuta" implementeaza Comparator<Ora> impreuna cu functia "compare" pentru a sorta
+orele din orarul de tip SortedSet
+- Folosirea metodei "Collections.sort()" pentru sortarea nodurilor unui drum in clasa "Drum",
+folosind "PozitieComparator" care implementeaza Comparator<Pozitie>
+
+5. Utilizarea de OO Design Principles in aplicatie
+
+In toata aplicatia am incercat respectarea a cat mai multe OO Design Principles cum ar fi:
+
+- Single Responsability Principle: fiecare clasa ar trebui sa se ocupe cu o singura functionalitate,
+sau cu alte cuvinte sa aiba o singura responsabilitate si sa nu incerce sa faca mai multe decat
+ar trebui sa faca: astfel am creat clase separate pentru drumuri, intersectii, statii, unitati de
+transport pentru ca fiecare element din reteaua de transport sa aiba propria clasa cu propria
+"responsabilitate".
+
+- Open/Closed Design Principle: prin care clase, metode sau functionalitati ar trebui sa fie deschise
+extinderii de noi functii si inchise pentru modificari: astfel pot fi create si alte unitati de
+transport in afara de autobuze, troleibuze si tramvaie folosind clasa "UnitateTransport", iar aceste
+noi unitati de transport vor avea functii asemanatoare cu cele deja existente (nu vor avea
+functionalitati modificate)
+
+- Liskov Substitution Principle: metodele care folosesc superclase trebuie sa poata lucra cu obiecte
+ale subclaselor acesteia fara probleme: astfel in foarte multe locuri atat Statiile cat si
+Intersectiile sunt tratate de foarte multe metode ca obiecte de tip Nod, acestea fiind compatibile.
+
+- Delegation Principle: am implementat metodele equals(), compare() si compareTo() pentru clasele
+Ora, Drum, Statie deoarece comparatia obiectelor trebuie ceruta clasei respective si nu facuta 
+manual in exteriorul clasei.
+
+- Don't Repeat Yourself Principle: prin care am incercat sa evit cat mai mult duplicarea codului,
+unul dintre exemple fiind faptul ca am implementat metode pentru equals() si compareTo(), evitand
+duplicarea codului acolo unde au fost facute comparatii.
